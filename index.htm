@@ -1,0 +1,124 @@
+<html>
+<!--
+ /**
+ * index.htm is a demo file to  work with a sample API file to be called via AJAX to 
+ * deliver the contents of 2 JSON files, one of which orders the 
+ * data by year, the other by Box Office results.
+ *
+ * The api page can be called via AJAX either via GET or POST, using a variable 
+ * named "cat":
+ *
+ * <code>
+ * api.php?cat=box
+ * </code>
+ *
+ * In the example above, the parameter cat is loaded with the string "box" 
+ * which will indicate to the API to load the JSON file containing 
+ * box office results.
+ *
+ * For troubleshooting, swap out the bondJSON() function with toConsole() 
+ * to examine the raw data returned
+ *
+ * @package bond-web-service
+ * @author Bill Newman
+ * @version 1.01 2015/02/15
+ * @link https://github.com/newmanix/bond-web-service 
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @see api.php
+ * @todo none
+ */
+-->
+<head>
+<title>Electric Car Web Service Demo</title>
+<style>
+body {font-family:georgia;}
+#cars {
+	max-width:600px;
+	margin:5px;
+	padding:2px;
+}
+#cars > div {
+	padding:5px;
+	min-height:40px;
+	margin-bottom:5px;
+	border:1px solid #E77D2C;
+	-moz-border-radius: 5px; 
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	position:relative; /* required to place #pic to right */
+}
+
+#cars h3 {
+	font-family:georgia;
+	padding:5px;
+	color:#fff;
+	background:#E77D2C;
+	margin:0;
+}
+
+#pic{
+	position:absolute;
+	right:10px;
+	top:10px;
+}
+</style>
+<script src="http://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {  
+
+	$('.category').click(function(e){
+        e.preventDefault(); //stop default action of the link
+		cat = $(this).attr("href");  //get category from URL
+		loadAJAX(cat);  //load AJAX and parse JSON file
+	});
+});	
+
+
+function loadAJAX(cat)
+{
+	$.ajax({  
+		type: "GET",
+		dataType: "json",  
+		url: "api.php?cat=" + cat,
+		success: bondJSON,
+	});
+
+	$('#cars').html('');//clear data
+}
+
+function toConsole(data)
+{//return data to console for JSON examination
+	console.log(data); //to view,use Chrome console, ctrl + shift + j
+}
+
+function bondJSON(data){
+	//$('#output').text(JSON.stringify(data));  //uncomment to view raw output
+	var header = data.title;
+	$('#filmtitle').html(header);
+	$.each(data.cars, function(i,item){
+	
+		var text = '<b>Brand and Model</b>: ' + '<b style="color:#ff0000">' + item.model + '</b>' + '<br />';
+		text += '<b>Mileage</b>: ' + '<b style="color:#187d01">' + item.mileage + '</b>' + '<br />';
+		text += '<b>Engine</b>: ' + item.engine + '<br />';
+		text += '<b>Type</b>: ' + item.type + '<br />';
+		text += '<b>Description</b>: ' + item.description + '<br />';
+		text += '<b>Price</b>: ' + '<b style="color:#ff7e00">' +item.price + '</b>' + '<br />';
+		text += '<div id="pic"><img src="thumbnails/' + item.Image + '" /></div>';
+		$('<div></div>').html(text).appendTo('#cars');  
+	});
+}
+
+</script>
+</head>
+	<body>
+	<h1>Electric Car Web Service Demo</h1>
+		<a href="mileage" class="category">Electric Cars By Mileage</a><br />
+		<a href="price" class="category">Electric Cars By Price</a>
+		<h3 id="filmtitle">Title Will Go Here</h3>
+		<div id="cars">
+			<p>Cars will go here</p>
+		</div>
+		<div id="output">Results of JSON.stringify go here</div>
+	</body>
+</html>
